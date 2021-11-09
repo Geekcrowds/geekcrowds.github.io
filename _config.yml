@@ -20,7 +20,7 @@ timezone: Pacific/Auckland
 
 title: Geekcrowds                         # the main title
 
-tagline: A place for geek crowds   # it will display as the sub-title
+tagline: A place for learn and fun   # it will display as the sub-title
 
 description: >-                        # used by seo meta and the atom feed
   A minimal, portfolio, sidebar,
