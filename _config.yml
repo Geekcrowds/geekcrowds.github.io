@@ -114,14 +114,14 @@ prose:
           label: "title"
       - name: "date"
         field:
-          element: "text"
-          label: "Date"
-          placeholder: "yyyy-mm-dd"
+          value: CURRENT_DATETIME
       - name: "categories"
         field:
+          element: "hidden"
           value: "post"
        - name: "tags"
         field:
+          element: "hidden"
           value: "post"
           
 # ------------ The following options are not recommended to be modified ------------------
