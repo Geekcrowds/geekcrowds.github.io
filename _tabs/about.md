@@ -6,4 +6,4 @@ published: true
 ---
 
 
-A place for lean and fun
+A place for learn and fun
