@@ -108,21 +108,34 @@ prose:
     - /js
   metadata:
     _posts:
+      - name: "layout"
+        field:
+          element: "hidden"
+          value: "post"
       - name: "title"
         field:
           element: "text"
-          label: "title"
+          label: "Post title"
+          placeholder: "Title"
+          alterable: true
+      - name: "subtitle"
+        field:
+          element: "textarea"
+          label: "Subtitle"
+          placeholder: "A description of your post."
+          alterable: true
       - name: "date"
         field:
-          value: CURRENT_DATETIME
-      - name: "categories"
+          element: "text"
+          label: "Date"
+          help: "Enter date of post."
+          placeholder: "yyyy-mm-dd"
+          alterable: true
+      - name: "published"
         field:
-          element: "hidden"
-          value: "post"
-       - name: "tags"
-        field:
-          element: "hidden"
-          value: "post"
+          element: "checkbox"
+          label: "Publish"
+          help: "Check to publish post, uncheck to hide."
           
 # ------------ The following options are not recommended to be modified ------------------
 
