@@ -1,5 +1,11 @@
+---
+title: KAZOO Ecallmgr Maintenance commands
+date: 2022-08-11 17:45:00 +1300
+categories: [VOIP]
+tags: [kazoo]
+---
+## Kazoo Ecallmgr Maintenance commands
 ···
-Ecallmgr Maintenance commands#
 
 All commands should be prefixed by sup -n ecallmgr ecallmgr_maintenance. So if the command is listed as list_fs_nodes, the full command you would actually run from the command line is sup -n ecallmgr ecallmgr_maintenance list_fs_nodes.
 
