@@ -4,18 +4,17 @@ date: 2022-08-12 20:45:00 +1300
 categories: [linux]
 tags: [Ubuntu]
 ---
-## Ubuntu Network configuration
 
 # Network configuration on the command line
 
 First type netstat -I to find the interface name. Then type the below command:
-
+``
 ifconfig eth0 192.168.72.6 netmask 255.255.255.0
-
+````
 Then to add a default gateway, add the below command:
-
+```
 route add default gw 192.168.72.1 eth0
-
+````
 
 
 # Configure the network by editing /etc/interfaces file
