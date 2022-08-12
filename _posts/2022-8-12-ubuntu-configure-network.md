@@ -1,3 +1,11 @@
+---
+title: KAZOO Ecallmgr Maintenance commands
+date: 2022-08-11 17:45:00 +1300
+categories: [linux]
+tags: [Ubuntu]
+---
+## Ubuntu Network configuration
+
 # Network configuration on the command line
 
 First type netstat -I to find the interface name. Then type the below command:
