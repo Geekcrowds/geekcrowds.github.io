@@ -2,7 +2,7 @@
 title: KAZOO Ecallmgr Maintenance commands
 date: 2022-08-11 17:45:00 +1300
 categories: [VOIP]
-tags: [kazoo]
+tags: [KAZOO]
 ---
 ## Kazoo Ecallmgr Maintenance commands
 ···
