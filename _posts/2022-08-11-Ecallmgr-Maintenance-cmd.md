@@ -5,11 +5,11 @@ categories: [VOIP]
 tags: [KAZOO]
 ---
 ## Kazoo Ecallmgr Maintenance commands
-···
 
+```
 All commands should be prefixed by sup -n ecallmgr ecallmgr_maintenance. So if the command is listed as list_fs_nodes, the full command you would actually run from the command line is sup -n ecallmgr ecallmgr_maintenance list_fs_nodes.
 
-!!!note -n {NODE} should be specified anytime the Erlang VM is not named kazoo_apps. Traditionally ecallmgr has run in its own Erlang VM named ecallmgr. This setup is no longer a requirement; adjust SUP's -n accordingly if you run differently.
+# note -n {NODE} should be specified anytime the Erlang VM is not named kazoo_apps. Traditionally ecallmgr has run in its own Erlang VM named ecallmgr. This setup is no longer a requirement; adjust SUP's -n accordingly if you run differently.
 
 SUP-able functions#
 Function	Arguments	Description
@@ -85,4 +85,4 @@ test_carrier_ip/1	(IP)	Tests an IP address against all connected FreeSWITCH serv
 test_carrier_ip/2	(IP,Node)	Tests an IP address against a specific FreeSWITCH server and reports if it would be allowed or denied by the carrier ACLs.
 test_sbc_ip/1	(IP)	Tests an IP address against all connected FreeSWITCH servers and reports if it would be allowed or denied by the SBC ACLs.
 test_sbc_ip/2	(IP,Node)	Tests an IP address against a specific FreeSWITCH server and reports if it would be allowed or denied by the SBC ACLs.
-···
+```
