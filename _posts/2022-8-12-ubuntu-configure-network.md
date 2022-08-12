@@ -1,6 +1,6 @@
 ---
 title: KAZOO Ecallmgr Maintenance commands
-date: 2022-08-11 17:45:00 +1300
+date: 2022-08-12 20:45:00 +1300
 categories: [linux]
 tags: [Ubuntu]
 ---
