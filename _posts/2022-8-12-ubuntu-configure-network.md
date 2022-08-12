@@ -1,5 +1,5 @@
 ---
-title: KAZOO Ecallmgr Maintenance commands
+title: Ubuntu Network configuration
 date: 2022-08-12 20:45:00 +1300
 categories: [linux]
 tags: [Ubuntu]
