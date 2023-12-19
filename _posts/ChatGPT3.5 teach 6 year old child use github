@@ -1,0 +1,149 @@
+Imagine GitHub like a magical place where you can keep all your drawings and crafts. It's like a big folder that lives on the computer, but it's super special because it helps you keep track of all the changes you make to your drawings.
+
+Here's how you can explain it:
+
+Creating Your Folder (Repository): Just like you have a special folder for your drawings, on GitHub, you make something called a "repository." It's like your magical folder. You give it a name, like "My Drawings."
+
+Adding Your Drawings (Files): In your repository, you can put all your drawings. Each drawing is like a special file. You can add new drawings whenever you want.
+
+Remembering Changes (Commits): Sometimes you make changes to your drawings, like adding more colors or new shapes. When you're happy with your changes, you can "commit" them. This is like taking a snapshot of your drawing at that moment, so you can always remember how it looked.
+
+Working with Friends (Collaboration): If your friends want to help you with your drawings, you can invite them to your magical folder. They can add their drawings too! GitHub helps everyone work together.
+
+Time Travel (Version History): GitHub is so cool because it lets you travel back in time! If you don't like the changes you made, you can go back to the old snapshot of your drawing and start from there.
+
+Sharing Magic (Sharing Your Repository): You can show your magical folder to anyone you want, like your family or friends. They can see all your drawings and the changes you've made.
+
+Pull Requests (Asking for Help): If you want to show your drawings to others before putting them in your magical folder, you can make a "pull request." It's like asking for advice. Your friends can tell you if they like your drawings or if you should make more changes.
+
+Remember, GitHub is like a big helper for keeping your drawings safe, showing them to others, and even working with your friends. Just like you're an artist, GitHub helps people who create computer programs work together and make amazing things!
+
+And always remember, it's okay to ask for help from grown-ups if you're not sure about something on GitHub. It's like asking for help when you're learning a new art technique!
+
+
+------------------------------------
+create 7 session for using github
+-----------------------------------
+outline 7 sessions to gradually introduce the basics of using GitHub to a 6-year-old. Keep in mind that each session should be short and engaging to maintain their interest. You can adjust the activities based on the child's familiarity with technology.
+
+Session 1: Introduction to GitHub and Creating a Repository
+
+Explain that GitHub is like a special place for keeping digital drawings.
+Compare it to a magical art folder on a computer.
+Together, create a "Magical Art" repository (folder) with a fun name.
+Session 2: Adding and Uploading Drawings (Files)
+
+Show how to add a new drawing (file) to the repository.
+Let the child choose a drawing from their collection and help them upload it to GitHub.
+Session 3: Making Changes and Committing
+
+Introduce the idea of making changes to drawings, like adding colors or shapes.
+Make a copy of the uploaded drawing and help the child make a simple change.
+Explain that committing is like saving the changes in a special way.
+Session 4: Time Travel with Versions
+
+Tell a fun story about time travel to make it exciting.
+Show how to go back in time by looking at different versions of the drawing.
+Ask the child to pick a version they like the most.
+Session 5: Drawing Together - Collaboration
+
+Talk about working with friends or family on drawings.
+Invite a friend (you or a sibling) to collaborate on a drawing in the repository.
+Show how to upload their drawing too.
+Session 6: Asking for Help - Pull Requests
+
+Explain that sometimes, artists want feedback on their work before finishing it.
+Pretend to be a friend and suggest a change to a drawing.
+Show how to make a "magical request" for help, similar to a pull request.
+Session 7: Sharing Your Magic - Repository Sharing
+
+Talk about sharing drawings with others, just like showing them to friends.
+Show how to share the repository link with family members.
+Celebrate by looking at all the drawings and changes made together.
+Remember to keep the sessions light, interactive, and focused on their creativity. Use simple analogies and age-appropriate language to help them understand. Feel free to adjust the pace based on their interest and comfort level with technology.
+
+---------------------------------------------------------------------------------
+each session will take 1.5 hour, create more detail outline for each session
+--------------------------------------------------------------------------------
+here's a more detailed outline for each of the 7 sessions, assuming each session lasts for 1.5 hours. Keep in mind that children's attention spans may vary, so adapt the activities as needed to maintain engagement.
+
+Session 1: Introduction to GitHub and Creating a Repository
+
+Start with a simple analogy: "GitHub is like a special place where computer artists keep their digital drawings."
+Show a physical folder and compare it to a repository.
+Open a web browser and navigate to GitHub.
+Guide the child in creating their own GitHub account (with parental supervision if required).
+Together, create a "Magical Art" repository using the "New" button.
+Explain how this is their magical folder to keep all their digital drawings safe.
+Session 2: Adding and Uploading Drawings (Files)
+
+Recap the previous session briefly.
+Open the "Magical Art" repository.
+Guide the child to find a digital drawing on the computer.
+Show how to upload the drawing to the repository using the "Upload files" button.
+Help the child give a fun name to their drawing and commit the upload.
+Celebrate the first drawing being in their magical folder.
+Session 3: Making Changes and Committing
+
+Start with a quick recap of the repository and uploaded drawing.
+Explain how artists often change their drawings to make them better.
+Duplicate the uploaded drawing and help the child make a small change (add a new color, draw a new shape, etc.).
+Show how to commit these changes with a special message, like "Added new color!"
+Emphasize that they can always go back to the old drawing using the history.
+Session 4: Time Travel with Versions
+
+Begin with a fun time travel analogy.
+Open the repository and show how to explore the different versions of a drawing.
+Pick a drawing and ask the child which version they like best.
+Let them "travel back in time" to the chosen version of the drawing.
+Reiterate that GitHub helps artists keep track of their artistic journey.
+Session 5: Drawing Together - Collaboration
+
+Recap the concept of artists working together on drawings.
+Introduce the idea of inviting a friend (you or a sibling) to collaborate.
+Make a simple change to the drawing together and commit the change.
+Show the child how the drawing changed with your collaboration.
+Ask the child to invite a family member to collaborate on a drawing.
+Session 6: Asking for Help - Pull Requests
+
+Begin with a storytelling approach about artists seeking advice from friends.
+Suggest a playful change to one of the drawings in the repository.
+Guide the child to make a "magical request" for help (create a pull request).
+Explain that this is a way to show their drawings to others and ask for ideas.
+Emphasize that feedback helps artists grow and learn.
+Session 7: Sharing Your Magic - Repository Sharing
+
+Recap the previous sessions briefly.
+Talk about sharing drawings with family members or friends.
+Show how to find and copy the repository link.
+Help the child send the link to family members to see their drawings.
+Celebrate by looking at all the drawings together and talking about their creative journey on GitHub.
+Remember to keep the sessions interactive and engaging, allowing the child to ask questions and explore. Adjust the pace and activities based on the child's interest and comfort level with technology.
+
+----------------------------------
+speech script for all 7 Sessions
+----------------------------------
+here are speech scripts for each of the 7 sessions:
+
+Session 1: Introduction to GitHub and Creating a Repository
+"Hey there! Today, we're going to learn about a magical place for digital artists called GitHub. Just like you have special folders for your drawings, GitHub is like a digital folder where computer artists keep their drawings. Imagine it like a magical art folder on the computer. Let's start by creating your own magical folder, or what we call a 'repository,' on GitHub. Are you ready?"
+
+Session 2: Adding and Uploading Drawings (Files)
+"Hello again! Last time, we made our magical folder on GitHub. Today, we'll add your amazing drawings to it! Imagine your drawings as special files. We'll pick a drawing, like the one you love the most, and upload it to your magical folder. Think of it as placing your drawing in a safe, digital place."
+
+Session 3: Making Changes and Committing
+"Welcome back! Artists like you often make their drawings even more magical by adding new colors or shapes. Today, let's change one of your drawings together. After you're happy with the changes, we'll save them in your magical folder. This is called 'committing,' and it's like taking a snapshot of your drawing so you can always remember how it looked."
+
+Session 4: Time Travel with Versions
+"Hi again! Do you know what time travel is? Well, GitHub has something a bit like that. It helps you travel back in time to see how your drawings changed. We'll look at different versions of your drawings and pick the one you like the most. It's like finding a special moment in your creative journey."
+
+Session 5: Drawing Together - Collaboration
+"Hey there, artist! Today, let's talk about working with friends on your drawings. Just like you and I can draw together on paper, you can also draw with friends on GitHub! We'll make a drawing together and see how we can share our creative magic."
+
+Session 6: Asking for Help - Pull Requests
+"Welcome back to our creative adventure! Artists often show their drawings to friends to get new ideas. Today, we'll learn how to ask for help on GitHub. It's like showing your drawings to your friends and asking, 'What do you think?' Let's send a magical request to your friends and see what they say!"
+
+Session 7: Sharing Your Magic - Repository Sharing
+"Hello, artist extraordinaire! Today is all about sharing your wonderful drawings with your family and friends. Just like you love showing your drawings to people, we'll share your magical folder with them. They can see all the drawings you've made and the changes you've created. Get ready to amaze everyone with your artistic journey!"
+
+Remember, these are just starting points. Feel free to add your own personal touches and adapt the scripts to suit the child's interests and understanding. The key is to keep it engaging, fun, and age-appropriate.
