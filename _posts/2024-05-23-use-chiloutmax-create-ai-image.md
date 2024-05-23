@@ -1,4 +1,4 @@
-use chiloutmax create ai image
+Use Chiloutmax Create AI image
 
 To use ChilloutMix for creating AI-generated images, you will need to follow several steps involving setting up a coding environment, integrating necessary code, and configuring the model. Here’s a concise guide on how to do it:
 
