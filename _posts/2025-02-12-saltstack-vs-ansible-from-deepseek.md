@@ -114,5 +114,14 @@ If your team values simplicity, ease of use, and quick setup, go with Ansible.
 
 If you need higher performance, scalability, and advanced features, or if you anticipate growing beyond 50 servers, choose Salt.
 
+
+<script src="https://utteranc.es/client.js"
+        repo="Geekcrowds/geekcrowds.github.io"
+        issue-term="pathname"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
+
 Final Thoughts
 For managing 30-50 servers, Ansible is often the better choice due to its simplicity, agentless architecture, and strong community support. However, if you have specific needs for real-time automation, scalability, or advanced features, Salt might be the better fit. Evaluate your team’s expertise and long-term goals before making a decision.
