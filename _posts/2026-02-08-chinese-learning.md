@@ -81,7 +81,7 @@ image:
 
 <div class="text-center mt-8">
   <p class="text-muted mb-4">开始你的中文学习之旅吧！</p>
-  <a href="/apps/chinese-vocab.html" class="btn btn-primary" target="_blank">
+  <a href="/apps/chinese-vocab-v3.html" class="btn btn-primary" target="_blank">
     <i class="fas fa-play-circle"></i> 打开学习工具
   </a>
 </div>
