@@ -1,5 +1,5 @@
 ---
-title: "汉语宝 V2 - 拼音汉字双向学习升级版"
+title: "汉语宝 拼音汉字双向学习升级版"
 date: 2026-02-08 15:30:00 +1300
 categories: [Tools, Language Learning]
 tags: [chinese, hsk, vocabulary, pinyin, education, interactive]
