@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汉语宝 V3 - 多字库学习系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+        }
+
+        .chinese-text {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+
+        /* Flip Card Animation */
+        .flip-card {
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+        }
+
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Confetti Animation */
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            z-index: 1000;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        /* Smooth Transitions */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Character Animation */
+        .char-pop {
+            animation: charPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes charPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        /* Quiz option hover effect */
+        .quiz-option {
+            transition: all 0.2s ease;
+        }
+        .quiz-option:hover:not(.correct-answer):not(.wrong-answer) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .correct-answer {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            animation: pulse 0.5s ease;
+            color: white !important;
+        }
+
+        .wrong-answer {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            animation: shake 0.5s ease;
+            color: white !important;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Library selector */
+        .library-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .library-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .library-card.active {
+            border-color: #a855f7;
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+        }
+
+        /* Stroke order animation */
+        .stroke-order {
+            font-size: 120px;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 min-h-screen">
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <div class="inline-block">
+                <h1 class="text-5xl font-black chinese-text mb-2 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+                    汉语宝 V3
+                </h1>
+                <p class="text-gray-600 text-sm mb-2">多字库智能学习系统 · Multi-Library Learning System</p>
+                <div class="flex gap-2 justify-center items-center text-xs text-gray-500 flex-wrap">
+                    <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded">📚 HSK考试</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded">📖 小学语文</span>
+                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded">🎯 自定义字库</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Library Selection Modal (shown first time or when changing library) -->
+        <div id="libraryModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="p-6 border-b border-gray-200">
+                    <h2 class="text-2xl font-bold text-gray-800 chinese-text">选择学习字库</h2>
+                    <p class="text-gray-600 text-sm mt-1">选择适合您的学习内容</p>
+                </div>
+                
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4" id="libraryList">
+                    <!-- Libraries will be injected here -->
+                </div>
+                
+                <div class="p-6 border-t border-gray-200 bg-gray-50">
+                    <button onclick="closeLibraryModal()" class="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-medium">
+                        开始学习
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Library Info Banner -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white text-2xl" id="currentLibraryIcon">
+                        📚
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800 chinese-text" id="currentLibraryName">HSK词汇</h3>
+                        <p class="text-xs text-gray-500" id="currentLibraryDesc">国际汉语水平考试词汇</p>
+                    </div>
+                </div>
+                <button onclick="showLibraryModal()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-all">
+                    <i class="fas fa-sync-alt mr-2"></i>切换字库
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                <div class="text-gray-500 text-xs font-medium mb-1">今日学习</div>
+                <div class="text-2xl font-bold text-purple-600" id="todayCount">0</div>
+            </div>
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                <div class="text-gray-500 text-xs font-medium mb-1">已掌握</div>
+                <div class="text-2xl font-bold text-green-600" id="masteredCount">0</div>
+            </div>
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                <div class="text-gray-500 text-xs font-medium mb-1">连续打卡</div>
+                <div class="text-2xl font-bold text-orange-600" id="streakCount">0</div>
+            </div>
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                <div class="text-gray-500 text-xs font-medium mb-1">总词汇量</div>
+                <div class="text-2xl font-bold text-blue-600" id="totalCount">0</div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 p-2">
+            <div class="flex gap-2">
+                <button onclick="switchTab('learn')" id="tab-learn" class="flex-1 px-6 py-3 rounded-lg font-medium transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+                    <i class="fas fa-book-open mr-2"></i>学习卡片
+                </button>
+                <button onclick="switchTab('quiz')" id="tab-quiz" class="flex-1 px-6 py-3 rounded-lg font-medium transition-all text-gray-600 hover:bg-gray-50">
+                    <i class="fas fa-question-circle mr-2"></i>趣味测验
+                </button>
+                <button onclick="switchTab('stats')" id="tab-stats" class="flex-1 px-6 py-3 rounded-lg font-medium transition-all text-gray-600 hover:bg-gray-50">
+                    <i class="fas fa-chart-bar mr-2"></i>学习统计
+                </button>
+            </div>
+        </div>
+
+        <!-- Level Filter (Dynamic based on library) -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6" id="filterSection">
+            <!-- Filter will be injected based on current library -->
+        </div>
+
+        <!-- Learning Section -->
+        <section id="learn-section" class="fade-in">
+            <!-- Flash Card -->
+            <div class="max-w-2xl mx-auto">
+                <div class="flip-card h-96 mb-6" id="flashCard" onclick="flipCard()">
+                    <div class="flip-card-inner h-full">
+                        <!-- Front -->
+                        <div class="flip-card-front bg-white shadow-xl p-8 flex flex-col items-center justify-center">
+                            <div class="text-8xl mb-4 chinese-text char-pop stroke-order" id="cardCharacter">你好</div>
+                            <div class="text-2xl text-gray-600 mb-2" id="cardPinyin">nǐ hǎo</div>
+                            <div class="text-sm text-gray-400">点击翻转查看含义</div>
+                        </div>
+                        <!-- Back -->
+                        <div class="flip-card-back bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-xl p-8 flex flex-col justify-center">
+                            <div class="text-3xl font-bold mb-4" id="cardEnglish">Hello</div>
+                            <div class="text-lg mb-4 chinese-text" id="cardExample">你好！很高兴见到你。</div>
+                            <div class="text-sm opacity-90 mb-4" id="cardExampleEn">Hello! Nice to meet you.</div>
+                            <div class="mt-6 pt-6 border-t border-white/30">
+                                <div class="text-sm opacity-75" id="cardMeta">HSK 1 · 问候</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Controls -->
+                <div class="flex gap-4 justify-center mb-8">
+                    <button onclick="markDifficult()" class="px-8 py-4 bg-red-500 hover:bg-red-600 text-white rounded-xl font-medium shadow-lg transition-all transform hover:scale-105">
+                        <i class="fas fa-times mr-2"></i>不认识
+                    </button>
+                    <button onclick="markKnown()" class="px-8 py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium shadow-lg transition-all transform hover:scale-105">
+                        <i class="fas fa-check mr-2"></i>认识
+                    </button>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <div class="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>今日进度</span>
+                        <span><span id="currentProgress">0</span> / <span id="dailyGoal">20</span></span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div id="progressBar" class="bg-gradient-to-r from-purple-600 to-pink-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section id="quiz-section" class="hidden">
+            <div class="max-w-2xl mx-auto">
+                
+                <!-- Quiz Mode Selector -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+                    <div class="text-sm font-medium text-gray-600 mb-3 text-center">选择测验模式</div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <button onclick="setQuizMode('pinyin-to-char')" id="mode-pinyin-to-char" class="mode-badge p-4 rounded-xl border-2 border-purple-200 bg-purple-50 text-purple-700 font-medium transition-all">
+                            <i class="fas fa-language mr-2"></i>
+                            <div class="text-sm">看拼音选汉字</div>
+                            <div class="text-xs opacity-75 mt-1">Pinyin → 汉字</div>
+                        </button>
+                        <button onclick="setQuizMode('char-to-pinyin')" id="mode-char-to-pinyin" class="mode-badge p-4 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-medium transition-all">
+                            <i class="fas fa-spell-check mr-2"></i>
+                            <div class="text-sm">看汉字选拼音</div>
+                            <div class="text-xs opacity-75 mt-1">汉字 → Pinyin</div>
+                        </button>
+                        <button onclick="setQuizMode('char-to-meaning')" id="mode-char-to-meaning" class="mode-badge p-4 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-medium transition-all">
+                            <i class="fas fa-globe mr-2"></i>
+                            <div class="text-sm">看汉字选含义</div>
+                            <div class="text-xs opacity-75 mt-1">汉字 → 含义</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quiz Card -->
+                <div class="bg-white rounded-xl shadow-lg p-8 mb-6">
+                    <div class="text-center mb-2">
+                        <div class="inline-block px-4 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium mb-4" id="quizModeLabel">
+                            看拼音选汉字
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mb-8">
+                        <div class="text-6xl mb-4 chinese-text" id="quizQuestion">xuéxí</div>
+                        <div class="text-sm text-gray-400" id="quizHint">请选择正确的汉字</div>
+                    </div>
+
+                    <!-- Quiz Options -->
+                    <div class="grid grid-cols-1 gap-3" id="quizOptions">
+                        <!-- Options will be injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Quiz Stats -->
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-white rounded-xl p-4 text-center shadow-sm">
+                        <div class="text-2xl font-bold text-green-600" id="quizCorrect">0</div>
+                        <div class="text-xs text-gray-500">答对</div>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 text-center shadow-sm">
+                        <div class="text-2xl font-bold text-red-600" id="quizWrong">0</div>
+                        <div class="text-xs text-gray-500">答错</div>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 text-center shadow-sm">
+                        <div class="text-2xl font-bold text-blue-600" id="quizAccuracy">0%</div>
+                        <div class="text-xs text-gray-500">正确率</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section id="stats-section" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Learning Progress Chart -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold mb-4 text-gray-800">学习进度</h3>
+                    <div class="h-64">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Level Distribution -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold mb-4 text-gray-800" id="levelChartTitle">等级分布</h3>
+                    <div class="h-64">
+                        <canvas id="levelChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Quiz Mode Performance -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold mb-4 text-gray-800">测验模式表现</h3>
+                    <div class="h-64">
+                        <canvas id="modeChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold mb-4 text-gray-800">最近学习</h3>
+                    <div id="recentActivity" class="space-y-3 max-h-64 overflow-y-auto">
+                        <!-- Activity items will be injected -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // ==================== VOCABULARY LIBRARIES ====================
+        
+        const vocabularyLibraries = {
+            hsk: {
+                id: 'hsk',
+                name: 'HSK词汇',
+                nameEn: 'HSK Vocabulary',
+                description: '国际汉语水平考试词汇 (HSK 1-4)',
+                icon: '📚',
+                color: 'purple',
+                levelType: 'hsk',
+                levelLabel: 'HSK等级',
+                levels: [
+                    { value: 'all', label: '全部' },
+                    { value: '1', label: 'HSK 1' },
+                    { value: '2', label: 'HSK 2' },
+                    { value: '3', label: 'HSK 3' },
+                    { value: '4', label: 'HSK 4' }
+                ],
+                vocabulary: [
+                    // HSK 1
+                    { id: 1, char: "你好", pinyin: "nǐ hǎo", meaning: "你好；问候", english: "Hello", example: "你好！很高兴见到你。", exampleEn: "Hello! Nice to meet you.", level: 1, category: "问候" },
+                    { id: 2, char: "谢谢", pinyin: "xièxie", meaning: "表示感谢", english: "Thank you", example: "谢谢你的帮助！", exampleEn: "Thank you for your help!", level: 1, category: "礼貌" },
+                    { id: 3, char: "再见", pinyin: "zàijiàn", meaning: "告别用语", english: "Goodbye", example: "再见！明天见。", exampleEn: "Goodbye! See you tomorrow.", level: 1, category: "问候" },
+                    { id: 4, char: "我", pinyin: "wǒ", meaning: "自称", english: "I / me", example: "我喜欢中文。", exampleEn: "I like Chinese.", level: 1, category: "代词" },
+                    { id: 5, char: "你", pinyin: "nǐ", meaning: "对方", english: "You", example: "你叫什么名字？", exampleEn: "What's your name?", level: 1, category: "代词" },
+                    { id: 6, char: "他", pinyin: "tā", meaning: "第三人称男性", english: "He / him", example: "他是我的朋友。", exampleEn: "He is my friend.", level: 1, category: "代词" },
+                    { id: 7, char: "好", pinyin: "hǎo", meaning: "优良；满意", english: "Good / well", example: "天气很好。", exampleEn: "The weather is very good.", level: 1, category: "形容词" },
+                    { id: 8, char: "吃", pinyin: "chī", meaning: "进食", english: "To eat", example: "我想吃饭。", exampleEn: "I want to eat.", level: 1, category: "动词" },
+                    { id: 9, char: "喝", pinyin: "hē", meaning: "饮用", english: "To drink", example: "你喝茶吗？", exampleEn: "Do you drink tea?", level: 1, category: "动词" },
+                    { id: 10, char: "爱", pinyin: "ài", meaning: "喜爱；爱护", english: "To love", example: "我爱我的家人。", exampleEn: "I love my family.", level: 1, category: "动词" },
+                    
+                    // HSK 2
+                    { id: 11, char: "学习", pinyin: "xuéxí", meaning: "获取知识", english: "To study / learn", example: "我在学习中文。", exampleEn: "I am studying Chinese.", level: 2, category: "动词" },
+                    { id: 12, char: "工作", pinyin: "gōngzuò", meaning: "劳动；职业", english: "To work / job", example: "他在公司工作。", exampleEn: "He works at a company.", level: 2, category: "动词" },
+                    { id: 13, char: "时间", pinyin: "shíjiān", meaning: "时刻", english: "Time", example: "现在几点？", exampleEn: "What time is it now?", level: 2, category: "名词" },
+                    { id: 14, char: "朋友", pinyin: "péngyou", meaning: "好友", english: "Friend", example: "她是我的好朋友。", exampleEn: "She is my good friend.", level: 2, category: "名词" },
+                    { id: 15, char: "高兴", pinyin: "gāoxìng", meaning: "愉快", english: "Happy / glad", example: "见到你很高兴。", exampleEn: "I'm glad to meet you.", level: 2, category: "形容词" }
+                ]
+            },
+            
+            primaryGrade1: {
+                id: 'primaryGrade1',
+                name: '人教版一年级上册',
+                nameEn: 'Primary Grade 1 Vol.1',
+                description: '小学语文一年级上册生字',
+                icon: '📖',
+                color: 'blue',
+                levelType: 'unit',
+                levelLabel: '单元',
+                levels: [
+                    { value: 'all', label: '全部' },
+                    { value: '1', label: '第一单元' },
+                    { value: '2', label: '第二单元' },
+                    { value: '3', label: '第三单元' },
+                    { value: '4', label: '第四单元' },
+                    { value: '5', label: '第五单元' }
+                ],
+                vocabulary: [
+                    // 第一单元 - 识字
+                    { id: 101, char: "天", pinyin: "tiān", meaning: "天空；一昼夜", english: "Sky / day", example: "今天天气很好。", exampleEn: "The weather is very good today.", level: 1, category: "名词", radical: "大" },
+                    { id: 102, char: "地", pinyin: "dì", meaning: "地面；土地", english: "Ground / earth", example: "我坐在地上。", exampleEn: "I sit on the ground.", level: 1, category: "名词", radical: "土" },
+                    { id: 103, char: "人", pinyin: "rén", meaning: "人类", english: "Person / people", example: "他是好人。", exampleEn: "He is a good person.", level: 1, category: "名词", radical: "人" },
+                    { id: 104, char: "你", pinyin: "nǐ", meaning: "称对方", english: "You", example: "你叫什么？", exampleEn: "What's your name?", level: 1, category: "代词", radical: "亻" },
+                    { id: 105, char: "我", pinyin: "wǒ", meaning: "自称", english: "I / me", example: "我是学生。", exampleEn: "I am a student.", level: 1, category: "代词", radical: "戈" },
+                    { id: 106, char: "他", pinyin: "tā", meaning: "那个人", english: "He / him", example: "他很高。", exampleEn: "He is tall.", level: 1, category: "代词", radical: "亻" },
+                    { id: 107, char: "一", pinyin: "yī", meaning: "数字1", english: "One", example: "一个人。", exampleEn: "One person.", level: 1, category: "数词", radical: "一" },
+                    { id: 108, char: "二", pinyin: "èr", meaning: "数字2", english: "Two", example: "二月。", exampleEn: "February.", level: 1, category: "数词", radical: "二" },
+                    { id: 109, char: "三", pinyin: "sān", meaning: "数字3", english: "Three", example: "三个人。", exampleEn: "Three people.", level: 1, category: "数词", radical: "一" },
+                    { id: 110, char: "四", pinyin: "sì", meaning: "数字4", english: "Four", example: "四月。", exampleEn: "April.", level: 1, category: "数词", radical: "囗" },
+                    
+                    // 第二单元 - 汉字家族
+                    { id: 201, char: "口", pinyin: "kǒu", meaning: "嘴", english: "Mouth", example: "张开口。", exampleEn: "Open your mouth.", level: 2, category: "名词", radical: "口" },
+                    { id: 202, char: "耳", pinyin: "ěr", meaning: "耳朵", english: "Ear", example: "我的耳朵。", exampleEn: "My ear.", level: 2, category: "名词", radical: "耳" },
+                    { id: 203, char: "目", pinyin: "mù", meaning: "眼睛", english: "Eye", example: "耳目。", exampleEn: "Eyes and ears.", level: 2, category: "名词", radical: "目" },
+                    { id: 204, char: "手", pinyin: "shǒu", meaning: "手掌", english: "Hand", example: "我的手。", exampleEn: "My hand.", level: 2, category: "名词", radical: "手" },
+                    { id: 205, char: "足", pinyin: "zú", meaning: "脚", english: "Foot", example: "手足。", exampleEn: "Hands and feet.", level: 2, category: "名词", radical: "足" },
+                    { id: 206, char: "站", pinyin: "zhàn", meaning: "直立", english: "To stand", example: "站起来。", exampleEn: "Stand up.", level: 2, category: "动词", radical: "立" },
+                    { id: 207, char: "坐", pinyin: "zuò", meaning: "就座", english: "To sit", example: "请坐。", exampleEn: "Please sit.", level: 2, category: "动词", radical: "土" },
+                    { id: 208, char: "日", pinyin: "rì", meaning: "太阳；白天", english: "Sun / day", example: "日月。", exampleEn: "Sun and moon.", level: 2, category: "名词", radical: "日" },
+                    { id: 209, char: "月", pinyin: "yuè", meaning: "月亮；月份", english: "Moon / month", example: "一月。", exampleEn: "January.", level: 2, category: "名词", radical: "月" },
+                    { id: 210, char: "火", pinyin: "huǒ", meaning: "燃烧", english: "Fire", example: "火车。", exampleEn: "Train.", level: 2, category: "名词", radical: "火" },
+                    
+                    // 第三单元 - 识字与课文
+                    { id: 301, char: "水", pinyin: "shuǐ", meaning: "液体", english: "Water", example: "喝水。", exampleEn: "Drink water.", level: 3, category: "名词", radical: "水" },
+                    { id: 302, char: "山", pinyin: "shān", meaning: "高地", english: "Mountain", example: "爬山。", exampleEn: "Climb a mountain.", level: 3, category: "名词", radical: "山" },
+                    { id: 303, char: "石", pinyin: "shí", meaning: "岩石", english: "Stone / rock", example: "石头。", exampleEn: "Stone.", level: 3, category: "名词", radical: "石" },
+                    { id: 304, char: "田", pinyin: "tián", meaning: "农田", english: "Field", example: "水田。", exampleEn: "Paddy field.", level: 3, category: "名词", radical: "田" },
+                    { id: 305, char: "禾", pinyin: "hé", meaning: "谷类植物", english: "Grain", example: "禾苗。", exampleEn: "Rice seedling.", level: 3, category: "名词", radical: "禾" },
+                    { id: 306, char: "上", pinyin: "shàng", meaning: "位置在高处", english: "Up / on", example: "上学。", exampleEn: "Go to school.", level: 3, category: "方位词", radical: "一" },
+                    { id: 307, char: "下", pinyin: "xià", meaning: "位置在低处", english: "Down / under", example: "下雨。", exampleEn: "It's raining.", level: 3, category: "方位词", radical: "一" },
+                    { id: 308, char: "土", pinyin: "tǔ", meaning: "泥土", english: "Soil / earth", example: "土地。", exampleEn: "Land.", level: 3, category: "名词", radical: "土" },
+                    { id: 309, char: "个", pinyin: "gè", meaning: "量词", english: "Measure word", example: "一个人。", exampleEn: "One person.", level: 3, category: "量词", radical: "人" },
+                    { id: 310, char: "八", pinyin: "bā", meaning: "数字8", english: "Eight", example: "八个。", exampleEn: "Eight.", level: 3, category: "数词", radical: "八" },
+                    
+                    // 第四单元 - 常用字
+                    { id: 401, char: "入", pinyin: "rù", meaning: "进去", english: "To enter", example: "入口。", exampleEn: "Entrance.", level: 4, category: "动词", radical: "入" },
+                    { id: 402, char: "大", pinyin: "dà", meaning: "面积广；年龄大", english: "Big / large", example: "大人。", exampleEn: "Adult.", level: 4, category: "形容词", radical: "大" },
+                    { id: 403, char: "小", pinyin: "xiǎo", meaning: "面积小；年龄小", english: "Small / little", example: "小孩。", exampleEn: "Child.", level: 4, category: "形容词", radical: "小" },
+                    { id: 404, char: "天", pinyin: "tiān", meaning: "天空", english: "Sky / heaven", example: "天上。", exampleEn: "In the sky.", level: 4, category: "名词", radical: "大" },
+                    { id: 405, char: "竹", pinyin: "zhú", meaning: "竹子", english: "Bamboo", example: "竹子。", exampleEn: "Bamboo.", level: 4, category: "名词", radical: "竹" },
+                    { id: 406, char: "牙", pinyin: "yá", meaning: "牙齿", english: "Tooth / teeth", example: "刷牙。", exampleEn: "Brush teeth.", level: 4, category: "名词", radical: "牙" },
+                    { id: 407, char: "马", pinyin: "mǎ", meaning: "马匹", english: "Horse", example: "骑马。", exampleEn: "Ride a horse.", level: 4, category: "名词", radical: "马" },
+                    { id: 408, char: "用", pinyin: "yòng", meaning: "使用", english: "To use", example: "用笔。", exampleEn: "Use a pen.", level: 4, category: "动词", radical: "用" },
+                    { id: 409, char: "几", pinyin: "jǐ", meaning: "多少", english: "How many", example: "几个？", exampleEn: "How many?", level: 4, category: "疑问词", radical: "几" },
+                    { id: 410, char: "只", pinyin: "zhǐ", meaning: "量词", english: "Measure word", example: "一只鸟。", exampleEn: "A bird.", level: 4, category: "量词", radical: "口" },
+                    
+                    // 第五单元 - 综合
+                    { id: 501, char: "儿", pinyin: "ér", meaning: "小孩", english: "Child / son", example: "儿子。", exampleEn: "Son.", level: 5, category: "名词", radical: "儿" },
+                    { id: 502, char: "见", pinyin: "jiàn", meaning: "看到", english: "To see / meet", example: "再见。", exampleEn: "Goodbye.", level: 5, category: "动词", radical: "见" },
+                    { id: 503, char: "白", pinyin: "bái", meaning: "白色", english: "White", example: "白云。", exampleEn: "White cloud.", level: 5, category: "形容词", radical: "白" },
+                    { id: 504, char: "田", pinyin: "tián", meaning: "田地", english: "Field", example: "田地。", exampleEn: "Farmland.", level: 5, category: "名词", radical: "田" },
+                    { id: 505, char: "电", pinyin: "diàn", meaning: "电力", english: "Electricity", example: "电话。", exampleEn: "Telephone.", level: 5, category: "名词", radical: "田" },
+                    { id: 506, char: "也", pinyin: "yě", meaning: "同样", english: "Also / too", example: "我也去。", exampleEn: "I'll go too.", level: 5, category: "副词", radical: "乙" },
+                    { id: 507, char: "长", pinyin: "cháng", meaning: "长度大", english: "Long", example: "很长。", exampleEn: "Very long.", level: 5, category: "形容词", radical: "长" },
+                    { id: 508, char: "山", pinyin: "shān", meaning: "山峰", english: "Mountain", example: "山上。", exampleEn: "On the mountain.", level: 5, category: "名词", radical: "山" },
+                    { id: 509, char: "出", pinyin: "chū", meaning: "从里到外", english: "To exit / out", example: "出去。", exampleEn: "Go out.", level: 5, category: "动词", radical: "凵" },
+                    { id: 510, char: "飞", pinyin: "fēi", meaning: "在空中移动", english: "To fly", example: "飞机。", exampleEn: "Airplane.", level: 5, category: "动词", radical: "飞" }
+                ]
+            }
+        };
+
+        // ==================== STATE MANAGEMENT ====================
+        
+        let currentLibraryId = localStorage.getItem('currentLibrary_v3') || 'hsk';
+        let currentLibrary = vocabularyLibraries[currentLibraryId];
+        let currentCardIndex = 0;
+        let filteredVocab = [];
+        let currentLevelFilter = 'all';
+        let todayLearned = [];
+        let masteredWords = JSON.parse(localStorage.getItem(`masteredWords_${currentLibraryId}_v3`)) || [];
+        let streakData = JSON.parse(localStorage.getItem('streakData_v3')) || { count: 0, lastDate: null };
+        let quizStats = { correct: 0, wrong: 0 };
+        let quizModeStats = JSON.parse(localStorage.getItem(`quizModeStats_${currentLibraryId}_v3`)) || {
+            'pinyin-to-char': { correct: 0, wrong: 0 },
+            'char-to-pinyin': { correct: 0, wrong: 0 },
+            'char-to-meaning': { correct: 0, wrong: 0 }
+        };
+        let currentQuizMode = 'pinyin-to-char';
+        let dailyGoal = 20;
+        let isQuizLocked = false;
+
+        // ==================== INITIALIZATION ====================
+        
+        function init() {
+            renderLibraryModal();
+            loadLibrary(currentLibraryId);
+            checkDailyReset();
+            updateStreakCounter();
+            updateStats();
+            
+            // Show library modal on first visit
+            if (!localStorage.getItem('hasVisited_v3')) {
+                showLibraryModal();
+                localStorage.setItem('hasVisited_v3', 'true');
+            }
+        }
+
+        // ==================== LIBRARY MANAGEMENT ====================
+        
+        function renderLibraryModal() {
+            const container = document.getElementById('libraryList');
+            container.innerHTML = '';
+            
+            Object.values(vocabularyLibraries).forEach(lib => {
+                const card = document.createElement('div');
+                card.className = `library-card p-6 rounded-xl border-2 ${lib.id === currentLibraryId ? 'active' : 'border-gray-200 bg-white'}`;
+                card.onclick = () => selectLibrary(lib.id);
+                
+                card.innerHTML = `
+                    <div class="text-4xl mb-3">${lib.icon}</div>
+                    <h3 class="text-lg font-bold text-gray-800 chinese-text mb-1">${lib.name}</h3>
+                    <p class="text-xs text-gray-500 mb-3">${lib.nameEn}</p>
+                    <p class="text-sm text-gray-600 mb-4">${lib.description}</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-500">共 ${lib.vocabulary.length} 个词</span>
+                        ${lib.id === currentLibraryId ? '<i class="fas fa-check-circle text-purple-600"></i>' : ''}
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        function selectLibrary(libraryId) {
+            if (libraryId !== currentLibraryId) {
+                currentLibraryId = libraryId;
+                localStorage.setItem('currentLibrary_v3', libraryId);
+                loadLibrary(libraryId);
+                renderLibraryModal();
+            }
+        }
+
+        function loadLibrary(libraryId) {
+            currentLibrary = vocabularyLibraries[libraryId];
+            
+            // Update UI
+            document.getElementById('currentLibraryIcon').textContent = currentLibrary.icon;
+            document.getElementById('currentLibraryName').textContent = currentLibrary.name;
+            document.getElementById('currentLibraryDesc').textContent = currentLibrary.description;
+            
+            // Load library-specific data
+            masteredWords = JSON.parse(localStorage.getItem(`masteredWords_${libraryId}_v3`)) || [];
+            quizModeStats = JSON.parse(localStorage.getItem(`quizModeStats_${libraryId}_v3`)) || {
+                'pinyin-to-char': { correct: 0, wrong: 0 },
+                'char-to-pinyin': { correct: 0, wrong: 0 },
+                'char-to-meaning': { correct: 0, wrong: 0 }
+            };
+            
+            // Reset filters and load vocabulary
+            currentLevelFilter = 'all';
+            filterVocab();
+            renderFilterSection();
+            updateStats();
+            loadCard();
+        }
+
+        function renderFilterSection() {
+            const container = document.getElementById('filterSection');
+            const levels = currentLibrary.levels;
+            
+            let html = `<div class="flex flex-wrap items-center gap-3">
+                <span class="text-sm font-medium text-gray-600">${currentLibrary.levelLabel}：</span>`;
+            
+            levels.forEach((level, index) => {
+                const isActive = level.value === currentLevelFilter;
+                html += `<button onclick="filterByLevel('${level.value}')" 
+                    class="level-filter px-4 py-2 rounded-lg text-sm font-medium transition-all ${isActive ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}" 
+                    data-level="${level.value}">
+                    ${level.label}
+                </button>`;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function filterByLevel(level) {
+            currentLevelFilter = level;
+            renderFilterSection();
+            filterVocab();
+            loadCard();
+        }
+
+        function filterVocab() {
+            if (currentLevelFilter === 'all') {
+                filteredVocab = [...currentLibrary.vocabulary];
+            } else {
+                filteredVocab = currentLibrary.vocabulary.filter(w => w.level == currentLevelFilter);
+            }
+            currentCardIndex = 0;
+        }
+
+        function showLibraryModal() {
+            document.getElementById('libraryModal').classList.remove('hidden');
+        }
+
+        function closeLibraryModal() {
+            document.getElementById('libraryModal').classList.add('hidden');
+        }
+
+        // ==================== LEARNING FUNCTIONS ====================
+        
+        function loadCard() {
+            if (filteredVocab.length === 0) {
+                alert('没有更多词汇了！请更改筛选条件。');
+                return;
+            }
+            
+            const word = filteredVocab[currentCardIndex];
+            document.getElementById('cardCharacter').textContent = word.char;
+            document.getElementById('cardPinyin').textContent = word.pinyin;
+            document.getElementById('cardEnglish').textContent = word.meaning || word.english;
+            document.getElementById('cardExample').textContent = word.example;
+            document.getElementById('cardExampleEn').textContent = word.exampleEn;
+            
+            // Update meta based on library type
+            let meta = '';
+            if (currentLibrary.levelType === 'hsk') {
+                meta = `HSK ${word.level} · ${word.category}`;
+            } else if (currentLibrary.levelType === 'unit') {
+                meta = `第${word.level}单元 · ${word.category}`;
+                if (word.radical) meta += ` · 部首：${word.radical}`;
+            }
+            document.getElementById('cardMeta').textContent = meta;
+            
+            // Reset flip
+            document.getElementById('flashCard').classList.remove('flipped');
+        }
+
+        function flipCard() {
+            document.getElementById('flashCard').classList.toggle('flipped');
+        }
+
+        function markKnown() {
+            const word = filteredVocab[currentCardIndex];
+            
+            if (!masteredWords.includes(word.id)) {
+                masteredWords.push(word.id);
+                localStorage.setItem(`masteredWords_${currentLibraryId}_v3`, JSON.stringify(masteredWords));
+                celebrateSuccess();
+            }
+            
+            if (!todayLearned.includes(word.id)) {
+                todayLearned.push(word.id);
+            }
+            
+            nextCard();
+        }
+
+        function markDifficult() {
+            const word = filteredVocab[currentCardIndex];
+            
+            if (!todayLearned.includes(word.id)) {
+                todayLearned.push(word.id);
+            }
+            
+            nextCard();
+        }
+
+        function nextCard() {
+            currentCardIndex = (currentCardIndex + 1) % filteredVocab.length;
+            loadCard();
+            updateStats();
+            
+            if (todayLearned.length === dailyGoal) {
+                setTimeout(() => {
+                    alert('🎉 恭喜！今天的学习目标达成了！');
+                    celebrateSuccess();
+                }, 300);
+            }
+        }
+
+        // ==================== QUIZ FUNCTIONS ====================
+        
+        function setQuizMode(mode) {
+            currentQuizMode = mode;
+            
+            ['pinyin-to-char', 'char-to-pinyin', 'char-to-meaning'].forEach(m => {
+                const btn = document.getElementById('mode-' + m);
+                if (m === mode) {
+                    if (m === 'pinyin-to-char') {
+                        btn.className = 'mode-badge p-4 rounded-xl border-2 border-purple-200 bg-purple-50 text-purple-700 font-medium transition-all';
+                    } else if (m === 'char-to-pinyin') {
+                        btn.className = 'mode-badge p-4 rounded-xl border-2 border-pink-200 bg-pink-50 text-pink-700 font-medium transition-all';
+                    } else {
+                        btn.className = 'mode-badge p-4 rounded-xl border-2 border-blue-200 bg-blue-50 text-blue-700 font-medium transition-all';
+                    }
+                } else {
+                    btn.className = 'mode-badge p-4 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-medium transition-all';
+                }
+            });
+            
+            loadQuiz();
+        }
+
+        let currentQuizWord = null;
+
+        function loadQuiz() {
+            if (isQuizLocked) return;
+            
+            const randomIndex = Math.floor(Math.random() * filteredVocab.length);
+            currentQuizWord = filteredVocab[randomIndex];
+            
+            let question, correctAnswer, optionPool;
+            
+            if (currentQuizMode === 'pinyin-to-char') {
+                question = currentQuizWord.pinyin;
+                correctAnswer = currentQuizWord.char;
+                optionPool = filteredVocab.map(w => w.char);
+                document.getElementById('quizModeLabel').textContent = '看拼音选汉字';
+                document.getElementById('quizHint').textContent = '请选择正确的汉字';
+            } else if (currentQuizMode === 'char-to-pinyin') {
+                question = currentQuizWord.char;
+                correctAnswer = currentQuizWord.pinyin;
+                optionPool = filteredVocab.map(w => w.pinyin);
+                document.getElementById('quizModeLabel').textContent = '看汉字选拼音';
+                document.getElementById('quizHint').textContent = '请选择正确的拼音';
+            } else {
+                question = currentQuizWord.char;
+                correctAnswer = currentQuizWord.meaning || currentQuizWord.english;
+                optionPool = filteredVocab.map(w => w.meaning || w.english);
+                document.getElementById('quizModeLabel').textContent = '看汉字选含义';
+                document.getElementById('quizHint').textContent = '请选择正确的含义';
+            }
+            
+            document.getElementById('quizQuestion').textContent = question;
+            document.getElementById('quizQuestion').className = currentQuizMode === 'pinyin-to-char' ? 'text-6xl mb-4' : 'text-6xl mb-4 chinese-text';
+            
+            const options = [correctAnswer];
+            const otherOptions = optionPool.filter(opt => opt !== correctAnswer);
+            
+            while (options.length < 4 && otherOptions.length > 0) {
+                const randomOpt = otherOptions[Math.floor(Math.random() * otherOptions.length)];
+                if (!options.includes(randomOpt)) {
+                    options.push(randomOpt);
+                    otherOptions.splice(otherOptions.indexOf(randomOpt), 1);
+                }
+            }
+            
+            options.sort(() => Math.random() - 0.5);
+            
+            const container = document.getElementById('quizOptions');
+            container.innerHTML = '';
+            
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option w-full px-6 py-4 bg-gray-50 hover:bg-gray-100 rounded-xl text-left font-medium transition-all';
+                if (currentQuizMode !== 'char-to-meaning') {
+                    btn.className += ' chinese-text text-lg';
+                }
+                btn.textContent = option;
+                btn.onclick = () => checkQuizAnswer(option, btn, correctAnswer);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkQuizAnswer(selected, button, correctAnswer) {
+            if (isQuizLocked) return;
+            isQuizLocked = true;
+            
+            const correct = selected === correctAnswer;
+            
+            if (correct) {
+                button.className = button.className.replace('bg-gray-50', '').replace('hover:bg-gray-100', '') + ' correct-answer';
+                quizStats.correct++;
+                quizModeStats[currentQuizMode].correct++;
+            } else {
+                button.className = button.className.replace('bg-gray-50', '').replace('hover:bg-gray-100', '') + ' wrong-answer';
+                quizStats.wrong++;
+                quizModeStats[currentQuizMode].wrong++;
+                
+                setTimeout(() => {
+                    const buttons = document.querySelectorAll('.quiz-option');
+                    buttons.forEach(btn => {
+                        if (btn.textContent === correctAnswer) {
+                            btn.className = btn.className.replace('bg-gray-50', '').replace('hover:bg-gray-100', '') + ' correct-answer';
+                        }
+                    });
+                }, 500);
+            }
+            
+            localStorage.setItem(`quizModeStats_${currentLibraryId}_v3`, JSON.stringify(quizModeStats));
+            updateQuizStats();
+            
+            setTimeout(() => {
+                isQuizLocked = false;
+                loadQuiz();
+            }, 1500);
+        }
+
+        function updateQuizStats() {
+            document.getElementById('quizCorrect').textContent = quizStats.correct;
+            document.getElementById('quizWrong').textContent = quizStats.wrong;
+            
+            const total = quizStats.correct + quizStats.wrong;
+            const accuracy = total > 0 ? Math.round((quizStats.correct / total) * 100) : 0;
+            document.getElementById('quizAccuracy').textContent = accuracy + '%';
+        }
+
+        // ==================== UTILITIES ====================
+        
+        function checkDailyReset() {
+            const today = new Date().toDateString();
+            const lastDate = localStorage.getItem('lastStudyDate_v3');
+            
+            if (lastDate !== today) {
+                todayLearned = [];
+                localStorage.setItem('lastStudyDate_v3', today);
+                
+                if (lastDate) {
+                    const last = new Date(lastDate);
+                    const current = new Date(today);
+                    const diffDays = Math.floor((current - last) / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays === 1) {
+                        streakData.count++;
+                    } else if (diffDays > 1) {
+                        streakData.count = 0;
+                    }
+                } else {
+                    streakData.count = 1;
+                }
+                
+                streakData.lastDate = today;
+                localStorage.setItem('streakData_v3', JSON.stringify(streakData));
+            }
+        }
+
+        function updateStreakCounter() {
+            document.getElementById('streakCount').textContent = streakData.count;
+        }
+
+        function updateStats() {
+            document.getElementById('todayCount').textContent = todayLearned.length;
+            document.getElementById('masteredCount').textContent = masteredWords.length;
+            document.getElementById('totalCount').textContent = currentLibrary.vocabulary.length;
+            document.getElementById('currentProgress').textContent = todayLearned.length;
+            document.getElementById('dailyGoal').textContent = dailyGoal;
+            
+            const progress = Math.min((todayLearned.length / dailyGoal) * 100, 100);
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function celebrateSuccess() {
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => createConfetti(), i * 50);
+            }
+        }
+
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.backgroundColor = ['#f87171', '#fbbf24', '#34d399', '#60a5fa', '#a78bfa'][Math.floor(Math.random() * 5)];
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 3000);
+        }
+
+        function switchTab(tab) {
+            document.getElementById('learn-section').classList.add('hidden');
+            document.getElementById('quiz-section').classList.add('hidden');
+            document.getElementById('stats-section').classList.add('hidden');
+            document.getElementById(tab + '-section').classList.remove('hidden');
+            
+            ['learn', 'quiz', 'stats'].forEach(t => {
+                const btn = document.getElementById('tab-' + t);
+                if (t === tab) {
+                    btn.className = 'flex-1 px-6 py-3 rounded-lg font-medium transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white';
+                } else {
+                    btn.className = 'flex-1 px-6 py-3 rounded-lg font-medium transition-all text-gray-600 hover:bg-gray-50';
+                }
+            });
+            
+            if (tab === 'quiz') {
+                loadQuiz();
+            } else if (tab === 'stats') {
+                renderCharts();
+                renderRecentActivity();
+            }
+        }
+
+        function renderCharts() {
+            // Progress chart
+            const ctx1 = document.getElementById('progressChart');
+            if (ctx1) {
+                new Chart(ctx1.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                        datasets: [{
+                            label: '学习词汇数',
+                            data: [12, 19, 15, 25, 22, 30, todayLearned.length],
+                            borderColor: '#a855f7',
+                            backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+            
+            // Level distribution
+            const levelCounts = {};
+            currentLibrary.levels.forEach(level => {
+                if (level.value !== 'all') levelCounts[level.label] = 0;
+            });
+            
+            masteredWords.forEach(id => {
+                const word = currentLibrary.vocabulary.find(w => w.id === id);
+                if (word) {
+                    const levelLabel = currentLibrary.levels.find(l => l.value == word.level)?.label;
+                    if (levelLabel) levelCounts[levelLabel]++;
+                }
+            });
+            
+            const ctx2 = document.getElementById('levelChart');
+            if (ctx2) {
+                new Chart(ctx2.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(levelCounts),
+                        datasets: [{
+                            data: Object.values(levelCounts),
+                            backgroundColor: ['#f87171', '#fbbf24', '#34d399', '#60a5fa', '#a78bfa']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+            
+            // Quiz mode performance
+            const ctx3 = document.getElementById('modeChart');
+            if (ctx3) {
+                new Chart(ctx3.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['拼音→汉字', '汉字→拼音', '汉字→含义'],
+                        datasets: [{
+                            label: '答对题数',
+                            data: [
+                                quizModeStats['pinyin-to-char'].correct,
+                                quizModeStats['char-to-pinyin'].correct,
+                                quizModeStats['char-to-meaning'].correct
+                            ],
+                            backgroundColor: ['#a855f7', '#ec4899', '#3b82f6'],
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+        }
+
+        function renderRecentActivity() {
+            const container = document.getElementById('recentActivity');
+            container.innerHTML = '';
+            
+            const recentWords = masteredWords.slice(-10).reverse();
+            
+            recentWords.forEach(id => {
+                const word = currentLibrary.vocabulary.find(w => w.id === id);
+                if (!word) return;
+                
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
+                item.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="text-2xl chinese-text">${word.char}</div>
+                        <div>
+                            <div class="text-sm font-medium">${word.pinyin}</div>
+                            <div class="text-xs text-gray-500">${word.meaning || word.english}</div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-400">${currentLibrary.levels.find(l => l.value == word.level)?.label || ''}</div>
+                `;
+                container.appendChild(item);
+            });
+            
+            if (recentWords.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-400 py-8">还没有学习记录</p>';
+            }
+        }
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>
