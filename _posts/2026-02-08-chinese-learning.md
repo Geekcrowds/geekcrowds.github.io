@@ -1,5 +1,5 @@
 ---
-title: "汉语宝 - 像百词斩一样学中文"
+title: "汉语宝 - 好好学中文"
 date: 2026-02-08 14:00:00 +1300
 categories: [Tools, Language Learning]
 tags: [chinese, hsk, vocabulary, education, interactive]
@@ -8,7 +8,7 @@ image:
   alt: Chinese Vocabulary Learning Tool
 ---
 
-我开发了一个交互式中文词汇学习工具，灵感来自百词斩的学习模式。
+交互式中文词汇学习工具。
 
 <div class="text-center my-8">
   <a href="/apps/chinese-vocab.html" class="btn btn-lg btn-primary" target="_blank">
