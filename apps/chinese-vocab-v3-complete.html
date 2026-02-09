@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汉语宝 V3 完整版 - 小学1-6年级全字库</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+        }
+
+        .chinese-text {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+
+        /* Flip Card Animation */
+        .flip-card {
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+        }
+
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Confetti Animation */
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            z-index: 1000;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        /* Smooth Transitions */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Character Animation */
+        .char-pop {
+            animation: charPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes charPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        /* Quiz option hover effect */
+        .quiz-option {
+            transition: all 0.2s ease;
+        }
+        .quiz-option:hover:not(.correct-answer):not(.wrong-answer) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .correct-answer {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            animation: pulse 0.5s ease;
+            color: white !important;
+        }
+
+        .wrong-answer {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            animation: shake 0.5s ease;
+            color: white !important;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Library selector */
+        .library-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .library-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .library-card.active {
+            border-color: #a855f7;
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+        }
+
+        /* Grade badge colors */
+        .grade-1 { border-color: #ef4444; background-color: #fef2f2; }
+        .grade-2 { border-color: #f59e0b; background-color: #fffbeb; }
+        .grade-3 { border-color: #10b981; background-color: #f0fdf4; }
+        .grade-4 { border-color: #3b82f6; background-color: #eff6ff; }
+        .grade-5 { border-color: #8b5cf6; background-color: #faf5ff; }
+        .grade-6 { border-color: #ec4899; background-color: #fdf2f8; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 min-h-screen">
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <div class="inline-block">
+                <h1 class="text-5xl font-black chinese-text mb-2 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+                    汉语宝 V3 完整版
+                </h1>
+                <p class="text-gray-600 text-sm mb-2">人教版1-6年级全字库 · Complete Primary School Edition</p>
+                <div class="flex gap-2 justify-center items-center text-xs text-gray-500 flex-wrap">
+                    <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded">📚 HSK考试</span>
+                    <span class="px-2 py-1 bg-red-100 text-red-700 rounded">📖 一年级</span>
+                    <span class="px-2 py-1 bg-orange-100 text-orange-700 rounded">📗 二年级</span>
+                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded">📕 三年级</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded">📘 四年级</span>
+                    <span class="px-2 py-1 bg-violet-100 text-violet-700 rounded">📚 五年级</span>
+                    <span class="px-2 py-1 bg-pink-100 text-pink-700 rounded">🎓 六年级</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Library Selection Modal -->
+        <div id="libraryModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+                    <h2 class="text-2xl font-bold text-gray-800 chinese-text">选择学习字库</h2>
+                    <p class="text-gray-600 text-sm mt-1">共12个字库，涵盖HSK和小学1-6年级</p>
+                </div>
+                
+                <div class="p-6">
+                    <!-- HSK Section -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-bold text-gray-700 mb-4 chinese-text">🎯 HSK考试字库</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="hskLibraryList"></div>
+                    </div>
+                    
+                    <!-- Primary School Section -->
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-700 mb-4 chinese-text">📚 人教版小学语文</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="primaryLibraryList"></div>
+                    </div>
+                </div>
+                
+                <div class="p-6 border-t border-gray-200 bg-gray-50 sticky bottom-0">
+                    <button onclick="closeLibraryModal()" class="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-medium">
+                        开始学习
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Library Info Banner -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white text-2xl" id="currentLibraryIcon">
+                        📚
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800 chinese-text" id="currentLibraryName">HSK词汇</h3>
+                        <p class="text-xs text-gray-500" id="currentLibraryDesc">国际汉语水平考试词汇</p>
+                    </div>
+                </div>
+                <button onclick="showLibraryModal()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-all">
+                    <i class="fas fa-sync-alt mr-2"></i>切换字库
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                <div class="text-gray-500 text-xs font-medium mb-1">今日学习</div>
+                <div class="text-2xl font-bold text-purple-600" id="todayCount">0</div>
+            </div>
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                <div class="text-gray-500 text-xs font-medium mb-1">已掌握</div>
+                <div class="text-2xl font-bold text-green-600" id="masteredCount">0</div>
+            </div>
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                <div class="text-gray-500 text-xs font-medium mb-1">连续打卡</div>
+                <div class="text-2xl font-bold text-orange-600" id="streakCount">0</div>
+            </div>
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                <div class="text-gray-500 text-xs font-medium mb-1">总词汇量</div>
+                <div class="text-2xl font-bold text-blue-600" id="totalCount">0</div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 p-2">
+            <div class="flex gap-2">
+                <button onclick="switchTab('learn')" id="tab-learn" class="flex-1 px-6 py-3 rounded-lg font-medium transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+                    <i class="fas fa-book-open mr-2"></i>学习卡片
+                </button>
+                <button onclick="switchTab('quiz')" id="tab-quiz" class="flex-1 px-6 py-3 rounded-lg font-medium transition-all text-gray-600 hover:bg-gray-50">
+                    <i class="fas fa-question-circle mr-2"></i>趣味测验
+                </button>
+                <button onclick="switchTab('stats')" id="tab-stats" class="flex-1 px-6 py-3 rounded-lg font-medium transition-all text-gray-600 hover:bg-gray-50">
+                    <i class="fas fa-chart-bar mr-2"></i>学习统计
+                </button>
+            </div>
+        </div>
+
+        <!-- Level Filter -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6" id="filterSection"></div>
+
+        <!-- Learning Section -->
+        <section id="learn-section" class="fade-in">
+            <div class="max-w-2xl mx-auto">
+                <div class="flip-card h-96 mb-6" id="flashCard" onclick="flipCard()">
+                    <div class="flip-card-inner h-full">
+                        <!-- Front -->
+                        <div class="flip-card-front bg-white shadow-xl p-8 flex flex-col items-center justify-center">
+                            <div class="text-8xl mb-4 chinese-text char-pop" id="cardCharacter">你好</div>
+                            <div class="text-2xl text-gray-600 mb-2" id="cardPinyin">nǐ hǎo</div>
+                            <div class="text-sm text-gray-400">点击翻转查看含义</div>
+                        </div>
+                        <!-- Back -->
+                        <div class="flip-card-back bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-xl p-8 flex flex-col justify-center">
+                            <div class="text-3xl font-bold mb-4" id="cardEnglish">Hello</div>
+                            <div class="text-lg mb-4 chinese-text" id="cardExample">你好！很高兴见到你。</div>
+                            <div class="text-sm opacity-90 mb-4" id="cardExampleEn">Hello! Nice to meet you.</div>
+                            <div class="mt-6 pt-6 border-t border-white/30">
+                                <div class="text-sm opacity-75" id="cardMeta">HSK 1 · 问候</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Controls -->
+                <div class="flex gap-4 justify-center mb-8">
+                    <button onclick="markDifficult()" class="px-8 py-4 bg-red-500 hover:bg-red-600 text-white rounded-xl font-medium shadow-lg transition-all transform hover:scale-105">
+                        <i class="fas fa-times mr-2"></i>不认识
+                    </button>
+                    <button onclick="markKnown()" class="px-8 py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium shadow-lg transition-all transform hover:scale-105">
+                        <i class="fas fa-check mr-2"></i>认识
+                    </button>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <div class="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>今日进度</span>
+                        <span><span id="currentProgress">0</span> / <span id="dailyGoal">20</span></span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div id="progressBar" class="bg-gradient-to-r from-purple-600 to-pink-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section id="quiz-section" class="hidden">
+            <div class="max-w-2xl mx-auto">
+                <!-- Quiz Mode Selector -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+                    <div class="text-sm font-medium text-gray-600 mb-3 text-center">选择测验模式</div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <button onclick="setQuizMode('pinyin-to-char')" id="mode-pinyin-to-char" class="mode-badge p-4 rounded-xl border-2 border-purple-200 bg-purple-50 text-purple-700 font-medium transition-all">
+                            <i class="fas fa-language mr-2"></i>
+                            <div class="text-sm">看拼音选汉字</div>
+                        </button>
+                        <button onclick="setQuizMode('char-to-pinyin')" id="mode-char-to-pinyin" class="mode-badge p-4 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-medium transition-all">
+                            <i class="fas fa-spell-check mr-2"></i>
+                            <div class="text-sm">看汉字选拼音</div>
+                        </button>
+                        <button onclick="setQuizMode('char-to-meaning')" id="mode-char-to-meaning" class="mode-badge p-4 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-medium transition-all">
+                            <i class="fas fa-globe mr-2"></i>
+                            <div class="text-sm">看汉字选含义</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quiz Card -->
+                <div class="bg-white rounded-xl shadow-lg p-8 mb-6">
+                    <div class="text-center mb-2">
+                        <div class="inline-block px-4 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium mb-4" id="quizModeLabel">
+                            看拼音选汉字
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mb-8">
+                        <div class="text-6xl mb-4 chinese-text" id="quizQuestion">xuéxí</div>
+                        <div class="text-sm text-gray-400" id="quizHint">请选择正确的汉字</div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-3" id="quizOptions"></div>
+                </div>
+
+                <!-- Quiz Stats -->
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-white rounded-xl p-4 text-center shadow-sm">
+                        <div class="text-2xl font-bold text-green-600" id="quizCorrect">0</div>
+                        <div class="text-xs text-gray-500">答对</div>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 text-center shadow-sm">
+                        <div class="text-2xl font-bold text-red-600" id="quizWrong">0</div>
+                        <div class="text-xs text-gray-500">答错</div>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 text-center shadow-sm">
+                        <div class="text-2xl font-bold text-blue-600" id="quizAccuracy">0%</div>
+                        <div class="text-xs text-gray-500">正确率</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section id="stats-section" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold mb-4 text-gray-800">学习进度</h3>
+                    <div class="h-64"><canvas id="progressChart"></canvas></div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold mb-4 text-gray-800" id="levelChartTitle">等级分布</h3>
+                    <div class="h-64"><canvas id="levelChart"></canvas></div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold mb-4 text-gray-800">测验模式表现</h3>
+                    <div class="h-64"><canvas id="modeChart"></canvas></div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold mb-4 text-gray-800">最近学习</h3>
+                    <div id="recentActivity" class="space-y-3 max-h-64 overflow-y-auto"></div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="primary-vocabularies-part1.js"></script>
+    <script>
+        // State Management
+        let currentLibraryId = localStorage.getItem('currentLibrary_v3') || 'hsk';
+        let currentLibrary = vocabularyLibraries[currentLibraryId];
+        let currentCardIndex = 0;
+        let filteredVocab = [];
+        let currentLevelFilter = 'all';
+        let todayLearned = [];
+        let masteredWords = JSON.parse(localStorage.getItem(`masteredWords_${currentLibraryId}_v3`)) || [];
+        let streakData = JSON.parse(localStorage.getItem('streakData_v3')) || { count: 0, lastDate: null };
+        let quizStats = { correct: 0, wrong: 0 };
+        let quizModeStats = JSON.parse(localStorage.getItem(`quizModeStats_${currentLibraryId}_v3`)) || {
+            'pinyin-to-char': { correct: 0, wrong: 0 },
+            'char-to-pinyin': { correct: 0, wrong: 0 },
+            'char-to-meaning': { correct: 0, wrong: 0 }
+        };
+        let currentQuizMode = 'pinyin-to-char';
+        let dailyGoal = 20;
+        let isQuizLocked = false;
+
+        // Initialize
+        function init() {
+            renderLibraryModal();
+            loadLibrary(currentLibraryId);
+            checkDailyReset();
+            updateStreakCounter();
+            updateStats();
+            
+            if (!localStorage.getItem('hasVisited_v3')) {
+                showLibraryModal();
+                localStorage.setItem('hasVisited_v3', 'true');
+            }
+        }
+
+        // Library Management
+        function renderLibraryModal() {
+            const hskContainer = document.getElementById('hskLibraryList');
+            const primaryContainer = document.getElementById('primaryLibraryList');
+            hskContainer.innerHTML = '';
+            primaryContainer.innerHTML = '';
+            
+            Object.values(vocabularyLibraries).forEach(lib => {
+                const card = document.createElement('div');
+                card.className = `library-card p-4 rounded-xl border-2 ${lib.id === currentLibraryId ? 'active' : 'border-gray-200 bg-white'}`;
+                card.onclick = () => selectLibrary(lib.id);
+                
+                card.innerHTML = `
+                    <div class="text-3xl mb-2">${lib.icon}</div>
+                    <h3 class="text-base font-bold text-gray-800 chinese-text mb-1">${lib.name}</h3>
+                    <p class="text-xs text-gray-500 mb-2">${lib.description}</p>
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-gray-500">${lib.vocabulary.length}词</span>
+                        ${lib.id === currentLibraryId ? '<i class="fas fa-check-circle text-purple-600"></i>' : ''}
+                    </div>
+                `;
+                
+                if (lib.id === 'hsk') {
+                    hskContainer.appendChild(card);
+                } else {
+                    primaryContainer.appendChild(card);
+                }
+            });
+        }
+
+        function selectLibrary(libraryId) {
+            if (libraryId !== currentLibraryId) {
+                currentLibraryId = libraryId;
+                localStorage.setItem('currentLibrary_v3', libraryId);
+                loadLibrary(libraryId);
+                renderLibraryModal();
+            }
+        }
+
+        function loadLibrary(libraryId) {
+            currentLibrary = vocabularyLibraries[libraryId];
+            document.getElementById('currentLibraryIcon').textContent = currentLibrary.icon;
+            document.getElementById('currentLibraryName').textContent = currentLibrary.name;
+            document.getElementById('currentLibraryDesc').textContent = currentLibrary.description;
+            
+            masteredWords = JSON.parse(localStorage.getItem(`masteredWords_${libraryId}_v3`)) || [];
+            quizModeStats = JSON.parse(localStorage.getItem(`quizModeStats_${libraryId}_v3`)) || {
+                'pinyin-to-char': { correct: 0, wrong: 0 },
+                'char-to-pinyin': { correct: 0, wrong: 0 },
+                'char-to-meaning': { correct: 0, wrong: 0 }
+            };
+            
+            currentLevelFilter = 'all';
+            filterVocab();
+            renderFilterSection();
+            updateStats();
+            loadCard();
+        }
+
+        function renderFilterSection() {
+            const container = document.getElementById('filterSection');
+            const levels = currentLibrary.levels;
+            
+            let html = `<div class="flex flex-wrap items-center gap-3">
+                <span class="text-sm font-medium text-gray-600">${currentLibrary.levelLabel}：</span>`;
+            
+            levels.forEach(level => {
+                const isActive = level.value === currentLevelFilter;
+                html += `<button onclick="filterByLevel('${level.value}')" 
+                    class="level-filter px-4 py-2 rounded-lg text-sm font-medium transition-all ${isActive ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}" 
+                    data-level="${level.value}">${level.label}</button>`;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function filterByLevel(level) {
+            currentLevelFilter = level;
+            renderFilterSection();
+            filterVocab();
+            loadCard();
+        }
+
+        function filterVocab() {
+            if (currentLevelFilter === 'all') {
+                filteredVocab = [...currentLibrary.vocabulary];
+            } else {
+                filteredVocab = currentLibrary.vocabulary.filter(w => w.level == currentLevelFilter);
+            }
+            currentCardIndex = 0;
+        }
+
+        function showLibraryModal() {
+            document.getElementById('libraryModal').classList.remove('hidden');
+        }
+
+        function closeLibraryModal() {
+            document.getElementById('libraryModal').classList.add('hidden');
+        }
+
+        // Learning Functions
+        function loadCard() {
+            if (filteredVocab.length === 0) {
+                alert('没有更多词汇了！请更改筛选条件。');
+                return;
+            }
+            
+            const word = filteredVocab[currentCardIndex];
+            document.getElementById('cardCharacter').textContent = word.char;
+            document.getElementById('cardPinyin').textContent = word.pinyin;
+            document.getElementById('cardEnglish').textContent = word.meaning || word.english;
+            document.getElementById('cardExample').textContent = word.example;
+            document.getElementById('cardExampleEn').textContent = word.exampleEn;
+            
+            let meta = '';
+            if (currentLibrary.levelType === 'hsk') {
+                meta = `HSK ${word.level} · ${word.category}`;
+            } else if (currentLibrary.levelType === 'unit') {
+                meta = `第${word.level}单元 · ${word.category}`;
+                if (word.radical) meta += ` · 部首：${word.radical}`;
+            }
+            document.getElementById('cardMeta').textContent = meta;
+            document.getElementById('flashCard').classList.remove('flipped');
+        }
+
+        function flipCard() {
+            document.getElementById('flashCard').classList.toggle('flipped');
+        }
+
+        function markKnown() {
+            const word = filteredVocab[currentCardIndex];
+            if (!masteredWords.includes(word.id)) {
+                masteredWords.push(word.id);
+                localStorage.setItem(`masteredWords_${currentLibraryId}_v3`, JSON.stringify(masteredWords));
+                celebrateSuccess();
+            }
+            if (!todayLearned.includes(word.id)) {
+                todayLearned.push(word.id);
+            }
+            nextCard();
+        }
+
+        function markDifficult() {
+            const word = filteredVocab[currentCardIndex];
+            if (!todayLearned.includes(word.id)) {
+                todayLearned.push(word.id);
+            }
+            nextCard();
+        }
+
+        function nextCard() {
+            currentCardIndex = (currentCardIndex + 1) % filteredVocab.length;
+            loadCard();
+            updateStats();
+            if (todayLearned.length === dailyGoal) {
+                setTimeout(() => {
+                    alert('🎉 恭喜！今天的学习目标达成了！');
+                    celebrateSuccess();
+                }, 300);
+            }
+        }
+
+        // Quiz Functions
+        function setQuizMode(mode) {
+            currentQuizMode = mode;
+            ['pinyin-to-char', 'char-to-pinyin', 'char-to-meaning'].forEach(m => {
+                const btn = document.getElementById('mode-' + m);
+                if (m === mode) {
+                    btn.className = m === 'pinyin-to-char' ? 'mode-badge p-4 rounded-xl border-2 border-purple-200 bg-purple-50 text-purple-700 font-medium transition-all' :
+                                     m === 'char-to-pinyin' ? 'mode-badge p-4 rounded-xl border-2 border-pink-200 bg-pink-50 text-pink-700 font-medium transition-all' :
+                                     'mode-badge p-4 rounded-xl border-2 border-blue-200 bg-blue-50 text-blue-700 font-medium transition-all';
+                } else {
+                    btn.className = 'mode-badge p-4 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-600 font-medium transition-all';
+                }
+            });
+            loadQuiz();
+        }
+
+        let currentQuizWord = null;
+
+        function loadQuiz() {
+            if (isQuizLocked) return;
+            const randomIndex = Math.floor(Math.random() * filteredVocab.length);
+            currentQuizWord = filteredVocab[randomIndex];
+            
+            let question, correctAnswer, optionPool;
+            if (currentQuizMode === 'pinyin-to-char') {
+                question = currentQuizWord.pinyin;
+                correctAnswer = currentQuizWord.char;
+                optionPool = filteredVocab.map(w => w.char);
+                document.getElementById('quizModeLabel').textContent = '看拼音选汉字';
+                document.getElementById('quizHint').textContent = '请选择正确的汉字';
+                document.getElementById('quizQuestion').className = 'text-6xl mb-4';
+            } else if (currentQuizMode === 'char-to-pinyin') {
+                question = currentQuizWord.char;
+                correctAnswer = currentQuizWord.pinyin;
+                optionPool = filteredVocab.map(w => w.pinyin);
+                document.getElementById('quizModeLabel').textContent = '看汉字选拼音';
+                document.getElementById('quizHint').textContent = '请选择正确的拼音';
+                document.getElementById('quizQuestion').className = 'text-6xl mb-4 chinese-text';
+            } else {
+                question = currentQuizWord.char;
+                correctAnswer = currentQuizWord.meaning || currentQuizWord.english;
+                optionPool = filteredVocab.map(w => w.meaning || w.english);
+                document.getElementById('quizModeLabel').textContent = '看汉字选含义';
+                document.getElementById('quizHint').textContent = '请选择正确的含义';
+                document.getElementById('quizQuestion').className = 'text-6xl mb-4 chinese-text';
+            }
+            
+            document.getElementById('quizQuestion').textContent = question;
+            
+            const options = [correctAnswer];
+            const otherOptions = optionPool.filter(opt => opt !== correctAnswer);
+            while (options.length < 4 && otherOptions.length > 0) {
+                const randomOpt = otherOptions[Math.floor(Math.random() * otherOptions.length)];
+                if (!options.includes(randomOpt)) {
+                    options.push(randomOpt);
+                    otherOptions.splice(otherOptions.indexOf(randomOpt), 1);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+            
+            const container = document.getElementById('quizOptions');
+            container.innerHTML = '';
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option w-full px-6 py-4 bg-gray-50 hover:bg-gray-100 rounded-xl text-left font-medium transition-all' + 
+                               (currentQuizMode !== 'char-to-meaning' ? ' chinese-text text-lg' : '');
+                btn.textContent = option;
+                btn.onclick = () => checkQuizAnswer(option, btn, correctAnswer);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkQuizAnswer(selected, button, correctAnswer) {
+            if (isQuizLocked) return;
+            isQuizLocked = true;
+            
+            if (selected === correctAnswer) {
+                button.className = button.className.replace('bg-gray-50', '').replace('hover:bg-gray-100', '') + ' correct-answer';
+                quizStats.correct++;
+                quizModeStats[currentQuizMode].correct++;
+            } else {
+                button.className = button.className.replace('bg-gray-50', '').replace('hover:bg-gray-100', '') + ' wrong-answer';
+                quizStats.wrong++;
+                quizModeStats[currentQuizMode].wrong++;
+                setTimeout(() => {
+                    document.querySelectorAll('.quiz-option').forEach(btn => {
+                        if (btn.textContent === correctAnswer) {
+                            btn.className = btn.className.replace('bg-gray-50', '').replace('hover:bg-gray-100', '') + ' correct-answer';
+                        }
+                    });
+                }, 500);
+            }
+            
+            localStorage.setItem(`quizModeStats_${currentLibraryId}_v3`, JSON.stringify(quizModeStats));
+            updateQuizStats();
+            setTimeout(() => {
+                isQuizLocked = false;
+                loadQuiz();
+            }, 1500);
+        }
+
+        function updateQuizStats() {
+            document.getElementById('quizCorrect').textContent = quizStats.correct;
+            document.getElementById('quizWrong').textContent = quizStats.wrong;
+            const total = quizStats.correct + quizStats.wrong;
+            document.getElementById('quizAccuracy').textContent = total > 0 ? Math.round((quizStats.correct / total) * 100) + '%' : '0%';
+        }
+
+        // Utilities
+        function checkDailyReset() {
+            const today = new Date().toDateString();
+            const lastDate = localStorage.getItem('lastStudyDate_v3');
+            if (lastDate !== today) {
+                todayLearned = [];
+                localStorage.setItem('lastStudyDate_v3', today);
+                if (lastDate) {
+                    const diffDays = Math.floor((new Date(today) - new Date(lastDate)) / (1000 * 60 * 60 * 24));
+                    streakData.count = diffDays === 1 ? streakData.count + 1 : diffDays > 1 ? 0 : streakData.count;
+                } else {
+                    streakData.count = 1;
+                }
+                streakData.lastDate = today;
+                localStorage.setItem('streakData_v3', JSON.stringify(streakData));
+            }
+        }
+
+        function updateStreakCounter() {
+            document.getElementById('streakCount').textContent = streakData.count;
+        }
+
+        function updateStats() {
+            document.getElementById('todayCount').textContent = todayLearned.length;
+            document.getElementById('masteredCount').textContent = masteredWords.length;
+            document.getElementById('totalCount').textContent = currentLibrary.vocabulary.length;
+            document.getElementById('currentProgress').textContent = todayLearned.length;
+            document.getElementById('dailyGoal').textContent = dailyGoal;
+            document.getElementById('progressBar').style.width = Math.min((todayLearned.length / dailyGoal) * 100, 100) + '%';
+        }
+
+        function celebrateSuccess() {
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = ['#f87171', '#fbbf24', '#34d399', '#60a5fa', '#a78bfa'][Math.floor(Math.random() * 5)];
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 50);
+            }
+        }
+
+        function switchTab(tab) {
+            ['learn', 'quiz', 'stats'].forEach(t => {
+                document.getElementById(t + '-section').classList.toggle('hidden', t !== tab);
+                const btn = document.getElementById('tab-' + t);
+                btn.className = t === tab ? 
+                    'flex-1 px-6 py-3 rounded-lg font-medium transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white' :
+                    'flex-1 px-6 py-3 rounded-lg font-medium transition-all text-gray-600 hover:bg-gray-50';
+            });
+            if (tab === 'quiz') loadQuiz();
+            else if (tab === 'stats') renderCharts();
+        }
+
+        function renderCharts() {
+            const ctx1 = document.getElementById('progressChart');
+            if (ctx1 && !ctx1.chart) {
+                ctx1.chart = new Chart(ctx1.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                        datasets: [{
+                            label: '学习词汇数',
+                            data: [12, 19, 15, 25, 22, 30, todayLearned.length],
+                            borderColor: '#a855f7',
+                            backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+                });
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
